@@ -1,0 +1,62 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+
+struct Point {
+    int x, y;
+};
+
+double distance(Point a, Point b) {
+    return sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));
+}
+
+int nearestNeighbor(vector<Point>& points, vector<bool>& visited, int currentCity) {
+    int numCities = points.size();
+    double minDistance = INT_MAX;
+    int nearestCity;
+
+    for (int i = 0; i < numCities; i++) {
+        if (!visited[i] && i != currentCity) {
+            double dist = distance(points[currentCity], points[i]);
+            if (dist < minDistance) {
+                minDistance = dist;
+                nearestCity = i;
+            }
+        }
+    }
+
+    visited[nearestCity] = true;
+    return nearestCity;
+}
+
+double tsp(vector<Point>& points) {
+    int numCities = points.size();
+    vector<bool> visited(numCities, false);
+    visited[0] = true;
+
+    int currentCity = 0;
+    int nextCity;
+    double totalDistance = 0;
+
+    for (int i = 0; i < numCities - 1; i++) {
+        nextCity = nearestNeighbor(points, visited, currentCity);
+        totalDistance += distance(points[currentCity], points[nextCity]);
+        currentCity = nextCity;
+    }
+
+    totalDistance += distance(points[currentCity], points[0]);
+
+    return totalDistance;
+}
+
+int main() {
+    vector<Point> points = {{0, 0}, {1, 3}, {4, 2}, {3, 1}};
+
+    double minDistance = tsp(points);
+
+    cout << "Minimum distance: " << minDistance << endl;
+
+    return 0;
+}
